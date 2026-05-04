@@ -2,193 +2,273 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AXION | UNIVERSAL COMMAND</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>AXION | OMNIMIND ENGINE</title>
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.0/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
+
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        luxBlack: '#050505',
                         luxGold: '#D4AF37',
-                        luxSlate: '#1A1A1A',
+                        luxBlack: '#020202',
+                        luxSlate: '#0A0A0A',
+                        luxEdge: 'rgba(212, 175, 55, 0.2)'
+                    },
+                    animation: {
+                        'glow-slow': 'glow 4s infinite alternate',
+                    },
+                    keyframes: {
+                        glow: { '0%': { opacity: 0.3 }, '100%': { opacity: 0.7 } }
                     }
                 }
             }
         }
     </script>
+
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200;400;800&family=JetBrains+Mono:wght@300&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200;400;800&family=JetBrains+Mono:wght@200&display=swap');
         
-        :root { --sat: env(safe-area-inset-top); }
         body { 
-            background: #050505; color: #D1D5DB; 
+            background: #020202; color: #f0f0f0; 
             font-family: 'Plus Jakarta Sans', sans-serif; 
-            overflow-x: hidden;
-            height: 100dvh; /* Dynamic viewport height para iOS */
+            overflow: hidden; height: 100dvh; 
         }
 
-        .luxury-glass {
-            background: rgba(15, 15, 15, 0.8);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px); /* Safari support */
-            border: 1px solid rgba(212, 175, 55, 0.1);
+        /* Vidrio de Lujo con Refracción */
+        .glass {
+            background: rgba(10, 10, 10, 0.7);
+            backdrop-filter: blur(25px) saturate(180%);
+            -webkit-backdrop-filter: blur(25px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 10px 40px -10px rgba(0,0,0,0.5);
         }
 
-        .gold-gradient {
-            background: linear-gradient(135deg, #D4AF37 0%, #F4D03F 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        #canvas-container { position: fixed; top: 0; left: 0; z-index: -1; width: 100%; height: 100%; }
+        .gold-border { border: 1px solid rgba(212, 175, 55, 0.3); }
         
-        /* Custom Scrollbar for Terminal */
-        .terminal-scroll::-webkit-scrollbar { width: 4px; }
-        .terminal-scroll::-webkit-scrollbar-thumb { background: #D4AF37; border-radius: 10px; }
+        /* Animaciones Suaves */
+        .view-transition { transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1); }
+        .hidden-view { opacity: 0; transform: translateY(20px); pointer-events: none; position: absolute; }
+        .active-view { opacity: 1; transform: translateY(0); pointer-events: all; position: relative; }
+
+        #bg-canvas { position: fixed; top: 0; left: 0; z-index: -1; }
+        
+        .custom-scroll::-webkit-scrollbar { width: 3px; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #D4AF37; }
     </style>
 </head>
-<body class="p-4 md:p-8 flex flex-col">
-    <div id="canvas-container"></div>
+<body class="flex flex-col p-4 md:p-6 lg:p-10">
 
-    <header class="flex flex-col md:flex-row justify-between items-center gap-6 mb-8">
-        <div class="flex items-center gap-4 w-full md:w-auto">
-            <div class="h-8 w-[2px] bg-luxGold shadow-[0_0_10px_#D4AF37]"></div>
-            <div>
-                <h1 class="text-xl md:text-2xl font-black tracking-tighter text-white uppercase">AXION <span class="gold-gradient italic">CORE</span></h1>
-                <p class="text-[8px] tracking-[0.4em] text-luxGold opacity-60 uppercase">Global Node: Active</p>
-            </div>
+    <canvas id="bg-canvas"></canvas>
+
+    <nav class="glass gold-border rounded-full px-6 py-3 flex justify-between items-center mb-8 z-50">
+        <div class="flex items-center gap-3">
+            <div class="w-3 h-3 bg-luxGold rounded-full animate-pulse shadow-[0_0_10px_#D4AF37]"></div>
+            <h1 class="text-lg font-black tracking-tighter uppercase italic">AXION <span class="font-light text-luxGold">OMNI</span></h1>
         </div>
         
-        <nav class="flex gap-3 w-full md:w-auto justify-center">
-            <a href="Sistemas.html" class="luxury-glass px-5 py-2.5 rounded-full text-[10px] font-bold tracking-widest text-white flex items-center gap-2 flex-1 md:flex-none justify-center border border-luxGold/20">
-                <i data-lucide="layers" class="w-4 h-4 text-luxGold"></i> SISTEMAS
-            </a>
-            <button class="luxury-glass px-5 py-2.5 rounded-full text-[10px] font-bold tracking-widest text-luxGold flex items-center gap-2 flex-1 md:flex-none justify-center">
-                <i data-lucide="shield" class="w-4 h-4"></i> SECURE
-            </button>
-        </nav>
-    </header>
+        <div class="hidden md:flex gap-8 text-[10px] font-bold tracking-[0.3em] uppercase">
+            <button onclick="switchView('core')" class="hover:text-luxGold transition">Core_OS</button>
+            <button onclick="switchView('systems')" class="hover:text-luxGold transition">Sistemas_Red</button>
+            <button onclick="switchView('security')" class="hover:text-luxGold transition">Seguridad</button>
+        </div>
 
-    <main class="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-6 flex-1 overflow-y-auto md:overflow-visible">
+        <div class="flex items-center gap-4">
+            <span id="clock" class="text-[10px] font-mono text-luxGold hidden sm:block">00:00:00</span>
+            <button class="md:hidden"><i data-lucide="menu" class="w-5 h-5"></i></button>
+        </div>
+    </nav>
+
+    <main class="relative flex-1">
         
-        <div class="md:col-span-3 space-y-4 order-2 md:order-1">
-            <div class="luxury-glass p-5 rounded-2xl">
-                <div class="flex justify-between items-center mb-4">
-                    <span class="text-[10px] text-luxGold uppercase tracking-widest">Neural Stream</span>
-                    <div class="w-2 h-2 rounded-full bg-luxGold animate-pulse"></div>
-                </div>
-                <canvas id="mobileChart" height="150"></canvas>
-            </div>
+        <div id="view-core" class="active-view view-transition grid grid-cols-1 md:grid-cols-12 gap-6 h-full">
             
-            <div class="grid grid-cols-2 md:grid-cols-1 gap-4">
-                <div class="luxury-glass p-4 rounded-2xl flex flex-col justify-center border-l-2 border-luxGold">
-                    <span class="text-[9px] text-gray-500 uppercase">Latency</span>
-                    <span class="text-xl font-bold text-white tracking-tighter">0.002<span class="text-luxGold text-xs">ms</span></span>
+            <div class="md:col-span-3 space-y-6">
+                <div class="glass p-6 rounded-[2rem] border-t border-luxGold/20">
+                    <h3 class="text-[10px] uppercase tracking-widest text-gray-500 mb-6">Neural Load Optimization</h3>
+                    <canvas id="neuralChart" height="180"></canvas>
                 </div>
-                <div class="luxury-glass p-4 rounded-2xl flex flex-col justify-center border-l-2 border-luxGold">
-                    <span class="text-[9px] text-gray-500 uppercase">Uptime</span>
-                    <span class="text-xl font-bold text-white tracking-tighter">99.9<span class="text-luxGold text-xs">%</span></span>
+                <div class="glass p-8 rounded-[2rem] flex flex-col items-center justify-center text-center group cursor-help">
+                    <div class="w-20 h-20 rounded-full border border-luxGold/10 flex items-center justify-center mb-4 relative overflow-hidden">
+                        <div class="absolute inset-0 bg-luxGold/5 animate-glow-slow"></div>
+                        <i data-lucide="zap" class="w-8 h-8 text-luxGold"></i>
+                    </div>
+                    <span class="text-[9px] uppercase tracking-tighter text-gray-500">Global Efficiency</span>
+                    <div class="text-4xl font-extrabold italic">99.2%</div>
+                </div>
+            </div>
+
+            <div class="md:col-span-6 glass rounded-[2.5rem] p-1 overflow-hidden flex flex-col">
+                <div class="bg-black/40 h-full rounded-[2.4rem] p-6 flex flex-col font-mono">
+                    <div class="flex justify-between items-center mb-4 border-b border-white/5 pb-4">
+                        <span class="text-[9px] text-luxGold uppercase">Root@Omnimind-X:~</span>
+                        <div class="flex gap-1">
+                            <div class="w-2 h-2 rounded-full bg-red-500/20"></div>
+                            <div class="w-2 h-2 rounded-full bg-luxGold/20"></div>
+                        </div>
+                    </div>
+                    <div id="terminal-out" class="flex-1 overflow-y-auto text-[11px] space-y-2 text-gray-400 custom-scroll pr-2">
+                        <p class="text-luxGold">[INFO] Protocolo 2045 iniciado en modo multiescala.</p>
+                        <p>[INFO] Detectando dispositivo: <span id="device-info">Buscando...</span></p>
+                    </div>
+                    <div class="mt-4 flex items-center gap-3 bg-white/5 p-3 rounded-xl">
+                        <span class="text-luxGold">λ</span>
+                        <input type="text" id="terminal-in" class="bg-transparent outline-none w-full text-white" placeholder="Ejecutar comando...">
+                    </div>
+                </div>
+            </div>
+
+            <div class="md:col-span-3 grid grid-rows-2 gap-6">
+                <div class="glass p-8 rounded-[2rem] flex flex-col justify-end border-r-4 border-luxGold/30">
+                    <p class="text-[10px] text-gray-500 uppercase">Traffic_Flow</p>
+                    <p class="text-5xl font-black italic tracking-tighter uppercase">1.2<span class="text-luxGold text-2xl">PB/s</span></p>
+                </div>
+                <div class="glass p-8 rounded-[2rem] flex flex-col justify-end border-r-4 border-luxGold/30">
+                    <p class="text-[10px] text-gray-500 uppercase">Security_Auth</p>
+                    <p class="text-5xl font-black italic tracking-tighter uppercase">Max<span class="text-luxGold text-2xl">Lvl</span></p>
                 </div>
             </div>
         </div>
 
-        <div class="md:col-span-6 h-[300px] md:h-auto order-1 md:order-2 luxury-glass rounded-3xl p-1 overflow-hidden">
-            <div class="h-full w-full bg-luxBlack/60 rounded-[1.4rem] p-5 flex flex-col font-mono">
-                <div id="term" class="flex-1 overflow-y-auto text-[11px] space-y-2 text-gray-400 terminal-scroll">
-                    <p class="text-luxGold opacity-50 text-[9px] underline uppercase tracking-widest mb-2 font-sans">-- Terminal initialized --</p>
-                    <p>> Omnimind-X Ready.</p>
-                    <p>> Protocol 2045.c Mobile-Optimized: <span class="text-white">ACTIVE</span>.</p>
+        <div id="view-systems" class="hidden-view view-transition flex flex-col gap-6">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="glass p-8 rounded-[2rem] border border-luxGold/10 hover:border-luxGold/50 transition">
+                    <i data-lucide="database" class="text-luxGold mb-4"></i>
+                    <h4 class="font-bold text-sm">Cluster Alpha</h4>
+                    <p class="text-xs text-gray-500 mt-2">Nodos activos: 4,021</p>
                 </div>
-                <div class="mt-4 flex items-center gap-2 border-t border-white/5 pt-4">
-                    <i data-lucide="chevron-right" class="w-4 h-4 text-luxGold"></i>
-                    <input type="text" id="in" class="bg-transparent outline-none w-full text-white text-xs" placeholder="Escribir comando..." autocomplete="off">
+                <div class="glass p-8 rounded-[2rem] border border-luxGold/10 hover:border-luxGold/50 transition">
+                    <i data-lucide="globe" class="text-luxGold mb-4"></i>
+                    <h4 class="font-bold text-sm">Satellite Link</h4>
+                    <p class="text-xs text-gray-500 mt-2">Latencia: 0.4ms</p>
                 </div>
+                <div class="glass p-8 rounded-[2rem] border border-luxGold/10 hover:border-luxGold/50 transition">
+                    <i data-lucide="cpu" class="text-luxGold mb-4"></i>
+                    <h4 class="font-bold text-sm">Core Load</h4>
+                    <p class="text-xs text-gray-500 mt-2">Temp: 32°C</p>
+                </div>
+                <div class="glass p-8 rounded-[2rem] border border-luxGold/10 hover:border-luxGold/50 transition">
+                    <i data-lucide="wifi" class="text-luxGold mb-4"></i>
+                    <h4 class="font-bold text-sm">Quantum Red</h4>
+                    <p class="text-xs text-gray-500 mt-2">Estado: Encriptado</p>
+                </div>
+            </div>
+            <div class="glass flex-1 rounded-[3rem] p-10 flex flex-col items-center justify-center border-dashed border-2 border-luxGold/20">
+                <i data-lucide="alert-triangle" class="w-12 h-12 text-luxGold/20 mb-4"></i>
+                <p class="text-luxGold/50 uppercase tracking-[0.5em] text-[10px]">Esperando Diagnóstico Profundo...</p>
             </div>
         </div>
 
-        <div class="md:col-span-3 space-y-4 order-3">
-            <div class="luxury-glass p-6 rounded-3xl flex flex-col items-center text-center relative overflow-hidden group">
-                <div class="absolute inset-0 bg-luxGold/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                <div class="w-16 h-16 rounded-full border border-luxGold/20 flex items-center justify-center mb-3">
-                    <i data-lucide="cpu" class="w-6 h-6 text-luxGold animate-pulse"></i>
-                </div>
-                <h4 class="text-[10px] font-bold tracking-[0.3em] uppercase text-gray-400">Core Status</h4>
-                <p class="text-3xl font-light text-white tracking-tighter">ULTRA</p>
-            </div>
-            
-            <button class="w-full luxury-glass py-4 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] text-luxGold hover:bg-luxGold hover:text-luxBlack transition-all">
-                Re-Sync Nodes
-            </button>
-        </div>
     </main>
+
+    <footer class="md:hidden glass gold-border fixed bottom-6 left-6 right-6 rounded-2xl p-4 flex justify-around items-center z-50">
+        <button onclick="switchView('core')"><i data-lucide="layout-dashboard" class="w-6 h-6 text-luxGold"></i></button>
+        <button onclick="switchView('systems')"><i data-lucide="layers" class="w-6 h-6"></i></button>
+        <button onclick="switchView('security')"><i data-lucide="shield-check" class="w-6 h-6"></i></button>
+    </footer>
 
     <script>
         lucide.createIcons();
 
-        // MOTOR 3D ADAPTATIVO
+        // 1. MOTOR 3D (Background)
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // Limita resolución en móviles 4K para rendimiento
+        const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('bg-canvas'), alpha: true, antialias: true });
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         renderer.setSize(window.innerWidth, window.innerHeight);
-        document.getElementById('canvas-container').appendChild(renderer.domElement);
 
-        const gridGeo = new THREE.SphereGeometry(15, 32, 32);
-        const gridMat = new THREE.MeshBasicMaterial({ color: 0xD4AF37, wireframe: true, transparent: true, opacity: 0.08 });
-        const grid = new THREE.Mesh(gridGeo, gridMat);
-        scene.add(grid);
-        camera.position.z = 25;
+        const geometry = new THREE.TorusKnotGeometry(10, 3, 100, 16);
+        const material = new THREE.MeshBasicMaterial({ color: 0xD4AF37, wireframe: true, transparent: true, opacity: 0.03 });
+        const mesh = new THREE.Mesh(geometry, material);
+        scene.add(mesh);
+        camera.position.z = 30;
 
         function animate() {
             requestAnimationFrame(animate);
-            grid.rotation.y += 0.002;
+            mesh.rotation.x += 0.001;
+            mesh.rotation.y += 0.002;
             renderer.render(scene, camera);
         }
         animate();
 
-        // CHART OPTIMIZATION
-        const ctx = document.getElementById('mobileChart').getContext('2d');
-        new Chart(ctx, {
+        // 2. CAMBIO DE VISTAS (SPA Logic)
+        function switchView(viewName) {
+            const views = ['view-core', 'view-systems']; // Expandir según necesites
+            views.forEach(v => {
+                const el = document.getElementById(v);
+                if(el) {
+                    el.classList.remove('active-view');
+                    el.classList.add('hidden-view');
+                }
+            });
+            const active = document.getElementById('view-' + viewName);
+            if(active) {
+                active.classList.remove('hidden-view');
+                active.classList.add('active-view');
+            }
+        }
+
+        // 3. CHART NEURAL
+        const ctx = document.getElementById('neuralChart').getContext('2d');
+        const neuralChart = new Chart(ctx, {
             type: 'line',
             data: {
-                labels: Array(15).fill(''),
+                labels: Array(20).fill(''),
                 datasets: [{
-                    data: Array(15).fill(0).map(() => Math.random() * 50 + 20),
+                    data: Array(20).fill(0).map(() => Math.random() * 100),
                     borderColor: '#D4AF37',
-                    borderWidth: 1.5,
-                    tension: 0.4,
+                    borderWidth: 1,
                     pointRadius: 0,
+                    tension: 0.4,
                     fill: true,
-                    backgroundColor: 'rgba(212, 175, 55, 0.05)'
+                    backgroundColor: 'rgba(212, 175, 55, 0.02)'
                 }]
             },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
-                scales: { x: { display: false }, y: { display: false } }
-            }
+            options: { plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { display: false } } }
         });
 
-        // TERMINAL INPUT HANDLING
-        const input = document.getElementById('in');
-        const output = document.getElementById('term');
+        // 4. TERMINAL LOGIC
+        const input = document.getElementById('terminal-in');
+        const output = document.getElementById('terminal-out');
         input.addEventListener('keypress', (e) => {
-            if(e.key === 'Enter' && input.value.trim() !== "") {
+            if(e.key === 'Enter') {
+                const cmd = input.value;
                 const p = document.createElement('p');
-                p.innerHTML = `<span class="text-luxGold font-bold">></span> ${input.value}`;
+                p.innerHTML = `<span class="text-luxGold">>></span> ${cmd}`;
                 output.appendChild(p);
+                
+                // Respuesta simulada
+                setTimeout(() => {
+                    const r = document.createElement('p');
+                    r.className = "text-white opacity-80";
+                    r.innerText = `[SYS] Ejecutando '${cmd}' en núcleo cuántico...`;
+                    output.appendChild(r);
+                    output.scrollTop = output.scrollHeight;
+                }, 400);
+                
                 input.value = '';
-                output.scrollTop = output.scrollHeight;
             }
         });
 
-        // RESIZE HANDLER
+        // 5. UTILIDADES
+        setInterval(() => {
+            const now = new Date();
+            document.getElementById('clock').innerText = now.getHours().toString().padStart(2, '0') + ":" + now.getMinutes().toString().padStart(2, '0') + ":" + now.getSeconds().toString().padStart(2, '0') + " UTC";
+            
+            // Actualizar Chart
+            neuralChart.data.datasets[0].data.shift();
+            neuralChart.data.datasets[0].data.push(Math.random() * 100);
+            neuralChart.update('none');
+        }, 1000);
+
+        // Detect Device
+        document.getElementById('device-info').innerText = /Mobi|Android/i.test(navigator.userAgent) ? "Mobile Node" : "Desktop Master Station";
+
         window.addEventListener('resize', () => {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
