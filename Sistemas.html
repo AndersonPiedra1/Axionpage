@@ -2,292 +2,206 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AXION | ERP QUANTUM NEURAL</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>AXION | SYSTEM CONTROL & ERP</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.0/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
-    
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        axionBlue: '#0057FF',
-                        axionCyan: '#00F0FF',
-                        erpGray: '#111111',
+                        gold: '#D4AF37',
+                        obsidian: '#020202',
+                        deepBlue: '#0015ff',
                     }
                 }
             }
         }
     </script>
-
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;900&display=swap');
-        
-        body {
-            background: #050505;
-            color: #f3f4f6;
-            font-family: 'Inter', sans-serif;
-            overflow-x: hidden;
-        }
-
-        .erp-border {
-            border: 1px solid rgba(0, 87, 255, 0.2);
-            background: rgba(255, 255, 255, 0.01);
-            backdrop-filter: blur(10px);
-        }
-
-        .data-stream {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 10px;
-        }
-
-        #bg-canvas {
-            position: fixed;
-            top: 0; left: 0; z-index: -1;
-            opacity: 0.3;
-        }
-
-        .module-card:hover {
-            border-color: #00F0FF;
-            box-shadow: 0 0 20px rgba(0, 240, 255, 0.1);
-            transform: translateY(-2px);
-        }
-
-        .blink { animation: blinker 1.5s linear infinite; }
-        @keyframes blinker { 50% { opacity: 0; } }
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200;400;800&family=JetBrains+Mono:wght@200&display=swap');
+        body { background: #020202; color: #f0f0f0; font-family: 'Plus Jakarta Sans', sans-serif; overflow-x: hidden; }
+        .glass { background: rgba(10, 10, 10, 0.8); backdrop-filter: blur(25px); border: 1px solid rgba(212, 175, 55, 0.15); }
+        .neon-border { box-shadow: 0 0 15px rgba(212, 175, 55, 0.1); }
+        #network-canvas { position: fixed; top: 0; left: 0; z-index: -1; opacity: 0.4; }
+        .status-pulse { animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-thumb { background: #D4AF37; }
     </style>
 </head>
-<body class="p-4 lg:p-6">
+<body class="p-4 md:p-8">
 
-    <canvas id="bg-canvas"></canvas>
+    <canvas id="network-canvas"></canvas>
 
-    <nav class="flex flex-wrap justify-between items-center mb-6 gap-4 erp-border p-4 rounded-xl">
+    <header class="max-w-7xl mx-auto mb-10 flex flex-col md:flex-row justify-between items-center gap-6">
         <div class="flex items-center gap-4">
-            <div class="text-xl font-black italic tracking-tighter">AXION<span class="text-axionBlue">_ERP</span></div>
-            <div class="h-6 w-[1px] bg-white/10 mx-2"></div>
-            <div class="flex items-center gap-2">
-                <span class="w-2 h-2 rounded-full bg-green-500 blink"></span>
-                <span class="data-stream text-gray-400">SERVER: OMNI-LINK_V4</span>
-            </div>
-        </div>
-        
-        <div class="flex items-center gap-6">
-            <div class="hidden md:flex gap-4">
-                <button class="text-[10px] font-bold uppercase tracking-widest text-gray-500 hover:text-axionCyan">Reportes</button>
-                <button class="text-[10px] font-bold uppercase tracking-widest text-gray-500 hover:text-axionCyan">Auditoría</button>
-            </div>
-            <a href="index.html" class="bg-axionBlue px-4 py-2 rounded text-[10px] font-bold uppercase tracking-[0.2em] hover:bg-white hover:text-black transition-all">
-                Cerrar Sesión
+            <a href="index.html" class="glass p-3 rounded-full hover:bg-gold hover:text-black transition-all group">
+                <i data-lucide="arrow-left" class="w-5 h-5"></i>
             </a>
+            <div>
+                <h1 class="text-2xl font-black italic tracking-tighter uppercase">SISTEMAS <span class="text-gold">ACTIVOS</span></h1>
+                <p class="text-[9px] font-mono text-gray-500 tracking-[0.4em] uppercase">Control Center // v.2045.01</p>
+            </div>
         </div>
-    </nav>
-
-    <main class="grid grid-cols-1 lg:grid-cols-4 gap-6">
         
-        <aside class="lg:col-span-1 space-y-6">
-            <div class="erp-border p-5 rounded-xl">
-                <h3 class="text-[10px] font-black text-axionBlue uppercase tracking-[0.3em] mb-4">Inventario Global</h3>
-                <div class="space-y-6">
-                    <div>
-                        <div class="flex justify-between text-[11px] mb-2">
-                            <span>Combustible Premium</span>
-                            <span class="text-axionCyan">842k m³</span>
-                        </div>
-                        <div class="h-1 bg-white/5 rounded-full overflow-hidden">
-                            <div class="bg-axionBlue h-full w-[78%]"></div>
-                        </div>
-                    </div>
-                    <div>
-                        <div class="flex justify-between text-[11px] mb-2">
-                            <span>Reserva Eléctrica</span>
-                            <span class="text-axionCyan">1.2 GW/h</span>
-                        </div>
-                        <div class="h-1 bg-white/5 rounded-full overflow-hidden">
-                            <div class="bg-axionCyan h-full w-[45%]"></div>
-                        </div>
-                    </div>
+        <div class="flex gap-4">
+            <div class="glass px-6 py-3 rounded-2xl flex items-center gap-4 border-l-4 border-gold">
+                <div class="w-2 h-2 bg-green-500 rounded-full status-pulse"></div>
+                <div class="text-[10px] font-mono">
+                    <span class="block text-gray-500">SERVIDOR CENTRAL</span>
+                    <span class="text-white">OPERACIONAL - 0.00ms</span>
                 </div>
             </div>
+        </div>
+    </header>
 
-            <div class="erp-border p-5 rounded-xl">
-                <h3 class="text-[10px] font-black text-axionBlue uppercase tracking-[0.3em] mb-4">Logística en Ruta</h3>
-                <div class="data-stream space-y-3">
-                    <div class="p-2 bg-white/5 rounded flex justify-between border-l-2 border-axionBlue">
-                        <span>TRUCK-094</span>
-                        <span class="text-green-500">EN TRÁNSITO</span>
-                    </div>
-                    <div class="p-2 bg-white/5 rounded flex justify-between border-l-2 border-yellow-500">
-                        <span>REFINERY-X</span>
-                        <span class="text-yellow-500">CARGANDO</span>
-                    </div>
-                    <div class="p-2 bg-white/5 rounded flex justify-between border-l-2 border-axionCyan">
-                        <span>SHIP-ALPHA</span>
-                        <span class="text-axionCyan">DOCKING</span>
-                    </div>
-                </div>
-            </div>
-        </aside>
-
-        <section class="lg:col-span-3 space-y-6">
+    <main class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-6">
+        
+        <div class="md:col-span-8 space-y-6">
             
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="erp-border p-6 rounded-xl module-card transition-all cursor-pointer">
-                    <div class="flex justify-between mb-4">
-                        <i data-lucide="dollar-sign" class="text-axionBlue"></i>
-                        <span class="text-[9px] font-bold text-gray-500 uppercase">Finanzas Netas</span>
+            <div class="glass p-8 rounded-[3rem] neon-border">
+                <div class="flex justify-between items-center mb-8">
+                    <h3 class="text-xs font-bold uppercase tracking-[0.4em] text-gold">Monitor de Eficiencia ERP</h3>
+                    <div class="flex gap-2">
+                        <span class="w-2 h-2 bg-white/20 rounded-full"></span>
+                        <span class="w-2 h-2 bg-white/20 rounded-full"></span>
                     </div>
-                    <div class="text-3xl font-black italic">$14.2M</div>
-                    <div class="text-[10px] text-green-500 mt-2 font-mono">+4.2% vs prev. cycle</div>
                 </div>
-                <div class="erp-border p-6 rounded-xl module-card transition-all cursor-pointer">
-                    <div class="flex justify-between mb-4">
-                        <i data-lucide="users" class="text-axionBlue"></i>
-                        <span class="text-[9px] font-bold text-gray-500 uppercase">Capital Humano</span>
-                    </div>
-                    <div class="text-3xl font-black italic">1,402</div>
-                    <div class="text-[10px] text-gray-400 mt-2 font-mono">Nodos Activos</div>
-                </div>
-                <div class="erp-border p-6 rounded-xl module-card transition-all cursor-pointer">
-                    <div class="flex justify-between mb-4">
-                        <i data-lucide="bar-chart-3" class="text-axionBlue"></i>
-                        <span class="text-[9px] font-bold text-gray-500 uppercase">Proyección IA</span>
-                    </div>
-                    <div class="text-3xl font-black italic">OPTIMAL</div>
-                    <div class="text-[10px] text-axionCyan mt-2 font-mono">Confianza: 98.4%</div>
+                <div class="h-[300px] w-full">
+                    <canvas id="erpChart"></canvas>
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="erp-border p-6 rounded-xl">
-                    <h3 class="text-[10px] font-black uppercase tracking-[0.3em] mb-6 flex items-center gap-2">
-                        <i data-lucide="trending-up" class="w-3 h-3 text-axionCyan"></i> Análisis de Mercado ERP
-                    </h3>
-                    <canvas id="erpChart" height="150"></canvas>
-                </div>
-                
-                <div class="erp-border p-6 rounded-xl flex flex-col h-full">
-                    <h3 class="text-[10px] font-black uppercase tracking-[0.3em] mb-4">Log de Transacciones</h3>
-                    <div id="erp-logs" class="data-stream space-y-2 overflow-y-auto max-h-[200px] pr-2">
-                        </div>
-                    <div class="mt-auto pt-4 border-t border-white/5 flex gap-2">
-                        <input type="text" id="erp-cmd" class="bg-transparent border border-white/10 px-4 py-2 text-xs w-full outline-none focus:border-axionCyan" placeholder="Ej: /vender 500L">
-                        <button onclick="executeERP()" class="bg-axionCyan text-black px-4 py-2 font-black text-[10px] uppercase tracking-tighter">Ejecutar</button>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div class="glass p-8 rounded-[2.5rem] hover:bg-white/5 transition-all group">
+                    <div class="flex justify-between mb-6">
+                        <i data-lucide="bar-chart-3" class="text-gold group-hover:rotate-12 transition"></i>
+                        <span class="text-[10px] font-mono text-gray-600">MOD_FINANZAS</span>
                     </div>
+                    <h4 class="text-lg font-bold mb-2">Contabilidad Cuántica</h4>
+                    <p class="text-xs text-gray-500 leading-relaxed">Automatización de flujos de caja y proyecciones fiscales mediante IA predictiva.</p>
                 </div>
+                <div class="glass p-8 rounded-[2.5rem] hover:bg-white/5 transition-all group">
+                    <div class="flex justify-between mb-6">
+                        <i data-lucide="package" class="text-gold group-hover:rotate-12 transition"></i>
+                        <span class="text-[10px] font-mono text-gray-600">MOD_LOGISTICA</span>
+                    </div>
+                    <h4 class="text-lg font-bold mb-2">Inventario Inteligente</h4>
+                    <p class="text-xs text-gray-500 leading-relaxed">Seguimiento de activos en tiempo real con 0% de margen de error en stock.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="md:col-span-4 space-y-6">
+            
+            <div class="glass p-8 rounded-[3rem] border-t-4 border-gold bg-gradient-to-b from-gold/5 to-transparent">
+                <h3 class="text-xl font-black italic mb-6 uppercase tracking-tighter">Solicitar <span class="text-gold">Auditoría</span></h3>
+                <form class="space-y-4">
+                    <div>
+                        <label class="text-[9px] font-bold uppercase text-gray-500 tracking-widest ml-2">Nombre del Proyecto</label>
+                        <input type="text" placeholder="Ej: Global ERP Alpha" class="w-full bg-white/5 border border-white/10 p-4 rounded-2xl text-sm outline-none focus:border-gold transition">
+                    </div>
+                    <div>
+                        <label class="text-[9px] font-bold uppercase text-gray-500 tracking-widest ml-2">Email Corporativo</label>
+                        <input type="email" placeholder="ceo@empresa.com" class="w-full bg-white/5 border border-white/10 p-4 rounded-2xl text-sm outline-none focus:border-gold transition">
+                    </div>
+                    <div>
+                        <label class="text-[9px] font-bold uppercase text-gray-500 tracking-widest ml-2">Nivel de Sistema</label>
+                        <select class="w-full bg-white/5 border border-white/10 p-4 rounded-2xl text-sm outline-none focus:border-gold transition text-gray-400">
+                            <option>Paquete Web Prestige</option>
+                            <option>Paquete ERP Quantum</option>
+                            <option>Nodos IA Personalizados</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="w-full bg-gold text-black py-5 rounded-2xl font-black uppercase tracking-[0.2em] text-xs hover:shadow-[0_0_30px_rgba(212,175,55,0.4)] transition-all">
+                        Enviar Requerimientos
+                    </button>
+                </form>
             </div>
 
-            <div class="erp-border rounded-xl overflow-hidden">
-                <table class="w-full text-left text-xs">
-                    <thead class="bg-white/5 uppercase font-black text-axionBlue tracking-widest text-[9px]">
-                        <tr>
-                            <th class="p-4">ID Recurso</th>
-                            <th class="p-4">Categoría</th>
-                            <th class="p-4">Carga</th>
-                            <th class="p-4">Estado</th>
-                            <th class="p-4">Acción</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-white/5 data-stream">
-                        <tr class="hover:bg-white/5">
-                            <td class="p-4 text-white">AX-INV-001</td>
-                            <td class="p-4">Petroquímica</td>
-                            <td class="p-4 font-bold">92%</td>
-                            <td class="p-4"><span class="px-2 py-1 bg-green-500/20 text-green-500 rounded">FULL</span></td>
-                            <td class="p-4 text-axionCyan cursor-pointer">Ver Detalles</td>
-                        </tr>
-                        <tr class="hover:bg-white/5">
-                            <td class="p-4 text-white">AX-INV-002</td>
-                            <td class="p-4">Carga Eléctrica</td>
-                            <td class="p-4 font-bold">14%</td>
-                            <td class="p-4"><span class="px-2 py-1 bg-red-500/20 text-red-500 rounded">CRITICAL</span></td>
-                            <td class="p-4 text-axionCyan cursor-pointer">Ver Detalles</td>
-                        </tr>
-                    </tbody>
-                </table>
+            <div class="glass p-8 rounded-[3rem] overflow-hidden relative">
+                <div class="flex items-center gap-2 mb-6">
+                    <i data-lucide="map" class="text-gold w-4 h-4"></i>
+                    <span class="text-[10px] font-bold uppercase tracking-widest">Nodos Globales</span>
+                </div>
+                <div class="aspect-square bg-white/5 rounded-full relative flex items-center justify-center">
+                    <div class="absolute inset-0 border border-gold/10 rounded-full animate-ping"></div>
+                    <div class="w-2 h-2 bg-gold rounded-full shadow-[0_0_15px_#D4AF37]"></div>
+                    <p class="text-[8px] font-mono text-gray-500 mt-12 uppercase tracking-[0.3em]">Latam_Node_Secure</p>
+                </div>
             </div>
-        </section>
+        </div>
     </main>
+
+    <footer class="max-w-7xl mx-auto mt-20 py-10 border-t border-white/5 flex flex-col md:flex-row justify-between items-center opacity-50">
+        <p class="text-[9px] font-mono uppercase tracking-widest">Axion OS // Systems Management</p>
+        <div class="flex gap-6 mt-4 md:mt-0">
+            <i data-lucide="shield" class="w-4 h-4"></i>
+            <i data-lucide="cpu" class="w-4 h-4"></i>
+            <i data-lucide="lock" class="w-4 h-4"></i>
+        </div>
+    </footer>
 
     <script>
         lucide.createIcons();
 
-        // MOTOR 3D: DIGITAL GRID ERP
+        // 1. MOTOR 3D: RED NEURAL DE FONDO
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('bg-canvas'), alpha: true });
+        const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('network-canvas'), alpha: true, antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
 
-        const grid = new THREE.GridHelper(100, 100, 0x0057FF, 0x001A4D);
-        scene.add(grid);
-        camera.position.z = 20;
-        camera.position.y = 10;
-        camera.rotation.x = -0.5;
+        const particles = new THREE.BufferGeometry();
+        const count = 500;
+        const pos = new Float32Array(count * 3);
+        for(let i=0; i<count*3; i++) pos[i] = (Math.random() - 0.5) * 100;
+        particles.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+        const mat = new THREE.PointsMaterial({ color: 0xD4AF37, size: 0.2, transparent: true, opacity: 0.5 });
+        const points = new THREE.Points(particles, mat);
+        scene.add(points);
+        camera.position.z = 50;
 
         function animate() {
             requestAnimationFrame(animate);
-            grid.position.z += 0.1;
-            if (grid.position.z > 2) grid.position.z = 0;
+            points.rotation.y += 0.001;
             renderer.render(scene, camera);
         }
         animate();
 
-        // ERP LOG SYSTEM
-        const logBox = document.getElementById('erp-logs');
-        const logs = [
-            "SHIPMENT_ID: 944 Authorized",
-            "REVENUE_LOG: +$14k Nodal Sale",
-            "SYSTEM: Neural sync complete",
-            "ALERT: Stock Low (Node-02)"
-        ];
-
-        function updateLogs() {
-            const entry = document.createElement('div');
-            entry.className = "flex justify-between py-1 border-b border-white/5 opacity-0 transition-opacity duration-500";
-            const time = new Date().toLocaleTimeString();
-            entry.innerHTML = `<span>[${time}] ${logs[Math.floor(Math.random()*logs.length)]}</span> <span class="text-axionCyan">0x${Math.random().toString(16).slice(2,6)}</span>`;
-            logBox.prepend(entry);
-            setTimeout(() => entry.classList.add('opacity-100'), 50);
-            if (logBox.children.length > 8) logBox.lastChild.remove();
-        }
-        setInterval(updateLogs, 3000);
-
-        // CHART.JS: FINANZAS ERP
+        // 2. GRÁFICO DINÁMICO ERP (Chart.js)
         const ctx = document.getElementById('erpChart').getContext('2d');
-        new Chart(ctx, {
-            type: 'bar',
+        const erpChart = new Chart(ctx, {
+            type: 'line',
             data: {
-                labels: ['ENE', 'FEB', 'MAR', 'ABR', 'MAY', 'JUN'],
+                labels: ['00h', '04h', '08h', '12h', '16h', '20h', '24h'],
                 datasets: [{
-                    label: 'Flujo de Capital (M)',
-                    data: [12, 19, 3, 5, 2, 3],
-                    backgroundColor: '#0057FF',
-                    borderRadius: 5
+                    label: 'Carga de Datos',
+                    data: [30, 45, 35, 60, 40, 70, 50],
+                    borderColor: '#D4AF37',
+                    borderWidth: 2,
+                    tension: 0.4,
+                    pointRadius: 4,
+                    pointBackgroundColor: '#D4AF37',
+                    fill: true,
+                    backgroundColor: 'rgba(212, 175, 55, 0.05)'
                 }]
             },
             options: {
                 responsive: true,
+                maintainAspectRatio: false,
                 plugins: { legend: { display: false } },
-                scales: { 
-                    y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#666' } },
-                    x: { grid: { display: false }, ticks: { color: '#666' } }
+                scales: {
+                    x: { grid: { display: false }, ticks: { color: '#555', font: { size: 10 } } },
+                    y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { display: false } }
                 }
             }
         });
 
-        function executeERP() {
-            const input = document.getElementById('erp-cmd');
-            if (input.value) {
-                const p = document.createElement('div');
-                p.className = "text-yellow-500 py-1";
-                p.innerText = `EJECUTANDO: ${input.value}...`;
-                logBox.prepend(p);
-                input.value = '';
-            }
-        }
-
+        // 3. RESPONSIVIDAD
         window.addEventListener('resize', () => {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
