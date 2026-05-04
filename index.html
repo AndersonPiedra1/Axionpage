@@ -1,361 +1,247 @@
+
 <!DOCTYPE html>
-<html lang="es" data-theme="light">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Optimice su deuda hipotecaria y reduzca sus pagos con nuestras opciones de refinanciamiento.">
-    <title>Refinanciamiento Hipotecario | Soluciones Financieras Premium</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>AXION | NEXUS SINGULARITY</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.0/three.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        axionBlue: '#0057FF',
+                        axionCyan: '#00F0FF',
+                        darkCore: '#050505',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
     <style>
-        :root {
-            --primary: #0f172a;
-            --primary-gradient: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
-            --accent: #2563eb;
-            --accent-hover: #1d4ed8;
-            --gold: #fbbf24;
-            --text-main: #334155;
-            --text-muted: #64748b;
-            --bg-light: #f8fafc;
-            --bg-card: rgba(255, 255, 255, 0.9);
-            --bg-footer: #f1f5f9;
-            --white: #ffffff;
-            --border: #e2e8f0;
-            --nav-bg: rgba(255, 255, 255, 0.95);
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;900&display=swap');
+        
+        body {
+            background-color: #050505;
+            margin: 0;
+            overflow-x: hidden;
+            color: white;
+            font-family: 'Inter', sans-serif;
         }
 
-        [data-theme="dark"] {
-            --primary: #f8fafc;
-            --primary-gradient: linear-gradient(135deg, #020617 0%, #0f172a 100%);
-            --text-main: #f1f5f9;
-            --text-muted: #94a3b8;
-            --bg-light: #0f172a;
-            --bg-card: rgba(30, 41, 59, 0.9);
-            --bg-footer: #020617;
-            --white: #0f172a;
-            --border: #334155;
-            --nav-bg: rgba(15, 23, 42, 0.95);
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; scroll-behavior: smooth; }
-        body { font-family: 'Inter', sans-serif; line-height: 1.6; color: var(--text-main); background-color: var(--bg-light); overflow-x: hidden; transition: background-color 0.3s, color 0.3s; }
-        .container { width: 100%; max-width: 1200px; margin: 0 auto; padding: 0 20px; position: relative; }
-        
-        nav { position: fixed; top: 0; width: 100%; background: var(--nav-bg); backdrop-filter: blur(10px); z-index: 1000; padding: 15px 0; border-bottom: 1px solid var(--border); transition: all 0.3s ease; }
-        .nav-container { display: flex; justify-content: space-between; align-items: center; }
-        .logo { font-size: 1.5rem; font-weight: 700; color: var(--accent); text-decoration: none; }
-        .nav-links { display: flex; gap: 20px; align-items: center; }
-        .nav-links a { text-decoration: none; color: var(--text-main); font-weight: 600; transition: color 0.3s; }
-        .nav-links a:hover { color: var(--accent); }
-        .theme-toggle { background: none; border: none; font-size: 1.2rem; color: var(--text-main); cursor: pointer; }
+        .glass {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
 
-        header { background: var(--primary-gradient); color: #fff; padding: 160px 20px 100px; text-align: center; position: relative; overflow: hidden; }
-        
-        /* ESTILOS DEL CANVAS */
-        #heroCanvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; opacity: 0.5; }
-        
-        .header-content { position: relative; z-index: 1; pointer-events: none; }
-        .header-content * { pointer-events: auto; }
-        
-        h1 { font-size: clamp(2.5rem, 6vw, 3.8rem); font-weight: 700; margin-bottom: 20px; text-shadow: 0 4px 15px rgba(0,0,0,0.3); color: #fff; }
-        .hero-text { font-size: 1.2rem; opacity: 0.9; max-width: 700px; margin: 0 auto 40px; color: #f1f5f9; }
-        
-        .btn-main { background: var(--accent); color: #fff; padding: 18px 40px; text-decoration: none; border-radius: 50px; font-weight: 600; font-size: 1.1rem; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); display: inline-flex; align-items: center; gap: 10px; box-shadow: 0 10px 20px rgba(37, 99, 235, 0.3); border: none; cursor: pointer; }
-        .btn-main:hover { transform: translateY(-5px) scale(1.05); background: var(--accent-hover); box-shadow: 0 15px 25px rgba(37, 99, 235, 0.4); color: #fff; }
+        .text-glow {
+            text-shadow: 0 0 20px rgba(0, 87, 255, 0.5);
+        }
 
-        .section { padding: 100px 0; position: relative; }
-        .bg-alt { background-color: var(--bg-footer); }
-        h2 { font-size: 2.5rem; color: var(--primary); text-align: center; margin-bottom: 60px; position: relative; }
-        h2::after { content: ''; display: block; width: 60px; height: 4px; background: var(--accent); margin: 15px auto 0; border-radius: 2px; }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: #050505; }
+        ::-webkit-scrollbar-thumb { background: #0057FF; border-radius: 10px; }
 
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 40px; }
-        .card { background: var(--bg-card); padding: 50px 30px; border-radius: 20px; border: 1px solid var(--border); text-align: center; transition: all 0.4s ease; position: relative; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
-        .card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 5px; background: var(--accent); transform: scaleX(0); transform-origin: left; transition: transform 0.4s ease; }
-        .card:hover { transform: translateY(-10px); box-shadow: 0 20px 40px rgba(0,0,0,0.1); border-color: transparent; }
-        .card:hover::before { transform: scaleX(1); }
-        .card-icon { font-size: 3rem; color: var(--accent); margin-bottom: 20px; transition: transform 0.3s ease; }
-        .card:hover .card-icon { transform: scale(1.2) rotate(5deg); color: var(--gold); }
-        .card h3 { margin-bottom: 15px; font-size: 1.4rem; color: var(--primary); }
+        .scanline {
+            width: 100%;
+            height: 2px;
+            background: rgba(0, 240, 255, 0.1);
+            position: absolute;
+            animation: scan 4s linear infinite;
+            z-index: 50;
+        }
 
-        .calculator-wrapper { max-width: 600px; margin: 0 auto; background: var(--bg-card); padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid var(--border); }
-        .form-group { margin-bottom: 20px; text-align: left; }
-        .form-group label { display: block; margin-bottom: 8px; font-weight: 600; color: var(--primary); }
-        .form-group input, .form-group select { width: 100%; padding: 12px 15px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg-light); color: var(--text-main); font-family: 'Inter', sans-serif; font-size: 1rem; transition: border-color 0.3s; }
-        .form-group input:focus, .form-group select:focus { outline: none; border-color: var(--accent); }
-        .result-box { margin-top: 30px; padding: 20px; background: var(--primary-gradient); color: #fff; border-radius: 12px; text-align: center; }
-        .result-amount { font-size: 2.5rem; font-weight: 700; color: var(--gold); }
-
-        .options-list { list-style: none; max-width: 800px; margin: 0 auto; background: var(--bg-card); padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid var(--border); }
-        .options-list li { margin-bottom: 25px; padding: 25px; border-radius: 12px; background: var(--bg-light); border-left: 4px solid var(--accent); transition: all 0.3s ease; display: flex; align-items: flex-start; gap: 15px; }
-        .options-list li:hover { transform: translateX(10px); background: var(--bg-card); box-shadow: 0 5px 15px rgba(0,0,0,0.08); border-left-color: var(--gold); }
-        .options-list i { font-size: 1.5rem; color: var(--accent); margin-top: 3px; }
-
-        footer { background: #020617; color: #94a3b8; padding: 60px 20px 20px; text-align: center; }
-        .footer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 40px; max-width: 1200px; margin: 0 auto 40px; text-align: left; }
-        .footer-col h4 { color: #fff; font-size: 1.2rem; margin-bottom: 20px; }
-        .footer-col p, .footer-col a { color: #94a3b8; text-decoration: none; display: block; margin-bottom: 10px; }
-        .footer-bottom { border-top: 1px solid #1e293b; padding-top: 20px; font-size: 0.9rem; }
-
-        .fade-in { opacity: 0; transform: translateY(30px); transition: opacity 0.8s ease, transform 0.8s ease; }
-        .fade-in.visible { opacity: 1; transform: translateY(0); }
-
-        @media (max-width: 768px) {
-            header { padding: 120px 20px 80px; }
-            .options-list { padding: 20px; }
-            .options-list li { flex-direction: column; }
-            .nav-links { display: none; }
+        @keyframes scan {
+            0% { top: 0; }
+            100% { top: 100%; }
         }
     </style>
 </head>
 <body>
 
-    <nav>
-        <div class="container nav-container">
-            <a href="#" class="logo"><i class="fa-solid fa-building-columns"></i> PremiumFinance</a>
-            <div class="nav-links">
-                <a href="#beneficios">Beneficios</a>
-                <a href="#calculadora">Calculadora</a>
-                <a href="#opciones">Opciones</a>
-                <a href="#contacto">Contacto</a>
-                <button class="theme-toggle" id="themeToggle" aria-label="Cambiar tema">
-                    <i class="fa-solid fa-moon"></i>
-                </button>
-            </div>
+    <div class="scanline"></div>
+    <div id="canvas-container"></div>
+
+    <nav class="fixed top-0 w-full z-[100] flex justify-between items-center px-8 py-6 border-b border-white/5 bg-black/20 backdrop-blur-md">
+        <div class="text-2xl font-black italic tracking-tighter uppercase text-white">
+            AXION<span class="text-axionBlue">_CORE</span>
         </div>
+        <div class="hidden md:flex space-x-10 text-[10px] font-bold uppercase tracking-[0.5em] text-gray-400">
+            <a href="#" class="hover:text-axionCyan transition-all">Sistemas</a>
+            <a href="#" class="hover:text-axionCyan transition-all">Red Global</a>
+            <a href="#" class="hover:text-axionCyan transition-all">I+D 2045</a>
+        </div>
+        <button class="glass px-6 py-2 rounded-full text-[10px] font-black uppercase tracking-widest hover:bg-axionBlue transition-all">
+            Identidad Nexus
+        </button>
     </nav>
 
-    <header>
-        <canvas id="heroCanvas"></canvas>
-
-        <div class="container header-content fade-in">
-            <h1>Refinanciamiento Inteligente</h1>
-            <p class="hero-text">Optimice su deuda hipotecaria, reduzca sus pagos mensuales y acceda al capital de su propiedad con las tasas más competitivas del mercado en 2026.</p>
-            <a href="#calculadora" class="btn-main">
-                Calcula tu Ahorro <i class="fa-solid fa-arrow-right"></i>
-            </a>
+    <section class="relative z-10 h-screen flex flex-col justify-center items-center px-6 text-center">
+        <div class="inline-block px-4 py-1 glass rounded-full text-axionCyan text-[10px] font-mono tracking-[0.4em] mb-6 uppercase">
+            Sistema de Propulsión Activo
         </div>
-    </header>
+        <h1 class="text-6xl md:text-9xl font-black leading-none mb-8 tracking-tighter">
+            ENERGÍA <br> 
+            <span class="text-transparent bg-clip-text bg-gradient-to-r from-axionBlue via-white to-axionCyan">INFINITA</span>
+        </h1>
+        <p class="max-w-2xl text-gray-400 text-lg md:text-xl mb-12 font-light italic">
+            Integrando la inteligencia de 10,000 nodos para la red energética del mañana. 
+            Eficiencia molecular. Latencia cero.
+        </p>
+        <div class="flex flex-col md:flex-row gap-4">
+            <button class="bg-axionBlue px-12 py-5 rounded-sm font-black text-xs uppercase tracking-[0.3em] hover:scale-105 transition-transform">
+                Iniciar Interfaz
+            </button>
+            <button class="glass px-12 py-5 rounded-sm font-black text-xs uppercase tracking-[0.3em] hover:bg-white/10 transition-all">
+                Explorar Nodos
+            </button>
+        </div>
+    </section>
 
-    <main>
-        <section id="beneficios" class="section">
-            <div class="container">
-                <h2 class="fade-in">¿Por qué refinanciar ahora?</h2>
-                <div class="grid">
-                    <article class="card fade-in">
-                        <i class="fa-solid fa-money-bill-trend-up card-icon"></i>
-                        <h3>Reducción de Intereses</h3>
-                        <p>Cambie su tasa actual por una más baja y ahorre miles de dólares durante la vida de su préstamo.</p>
-                    </article>
-                    <article class="card fade-in" style="transition-delay: 0.1s;">
-                        <i class="fa-solid fa-wallet card-icon"></i>
-                        <h3>Consolidación de Deuda</h3>
-                        <p>Utilice el valor acumulado de su vivienda para pagar tarjetas de crédito o préstamos con intereses altos.</p>
-                    </article>
-                    <article class="card fade-in" style="transition-delay: 0.2s;">
-                        <i class="fa-solid fa-calendar-check card-icon"></i>
-                        <h3>Cambio de Plazo</h3>
-                        <p>Ajuste la duración de su hipoteca para pagar su casa más rápido o reducir su cuota mensual drásticamente.</p>
-                    </article>
-                </div>
+    <section class="relative z-10 py-24 px-8 max-w-7xl mx-auto">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-1">
+            <div class="glass p-12 text-center group hover:border-axionCyan/50 transition-all">
+                <i data-lucide="zap" class="mx-auto mb-6 text-axionCyan"></i>
+                <h3 class="text-gray-500 text-[10px] tracking-widest uppercase mb-2">Potencia</h3>
+                <div class="text-4xl font-black">9.4 GW</div>
             </div>
-        </section>
+            <div class="glass p-12 text-center group hover:border-axionCyan/50 transition-all">
+                <i data-lucide="shield" class="mx-auto mb-6 text-axionCyan"></i>
+                <h3 class="text-gray-500 text-[10px] tracking-widest uppercase mb-2">Seguridad</h3>
+                <div class="text-4xl font-black">SL-9</div>
+            </div>
+            <div class="glass p-12 text-center group hover:border-axionCyan/50 transition-all">
+                <i data-lucide="globe" class="mx-auto mb-6 text-axionCyan"></i>
+                <h3 class="text-gray-500 text-[10px] tracking-widest uppercase mb-2">Nodos</h3>
+                <div class="text-4xl font-black">14.2k</div>
+            </div>
+            <div class="glass p-12 text-center group hover:border-axionCyan/50 transition-all">
+                <i data-lucide="cpu" class="mx-auto mb-6 text-axionCyan"></i>
+                <h3 class="text-gray-500 text-[10px] tracking-widest uppercase mb-2">IA Core</h3>
+                <div class="text-4xl font-black">SYN-X</div>
+            </div>
+        </div>
+    </section>
 
-        <section id="calculadora" class="section bg-alt">
-            <div class="container">
-                <h2 class="fade-in">Calculadora de Refinanciamiento</h2>
-                <div class="calculator-wrapper fade-in">
-                    <div class="form-group">
-                        <label for="loanAmount">Monto del Préstamo Estimado ($)</label>
-                        <input type="number" id="loanAmount" placeholder="Ej. 250000" value="250000">
-                    </div>
-                    <div class="form-group">
-                        <label for="interestRate">Tasa de Interés Anual (%)</label>
-                        <input type="number" id="interestRate" step="0.1" placeholder="Ej. 5.5" value="5.5">
-                    </div>
-                    <div class="form-group">
-                        <label for="loanTerm">Plazo del Préstamo (Años)</label>
-                        <select id="loanTerm">
-                            <option value="15">15 Años</option>
-                            <option value="20">20 Años</option>
-                            <option value="30" selected>30 Años</option>
-                        </select>
-                    </div>
-                    <button class="btn-main" style="width: 100%; justify-content: center;" onclick="calculateMortgage()">
-                        Calcular Cuota Mensual
-                    </button>
-                    
-                    <div class="result-box" id="resultBox" style="display: none;">
-                        <h4>Pago Principal e Interés Estimado</h4>
-                        <div class="result-amount" id="monthlyPayment">$0.00</div>
-                    </div>
-                </div>
+    <footer class="relative z-10 py-12 px-8 border-t border-white/5 text-center md:text-left">
+        <div class="flex flex-col md:flex-row justify-between items-center gap-8">
+            <div class="text-[10px] text-gray-600 font-mono tracking-widest uppercase">
+                © 2045 AXION CORPORATION | OMNIMIND-X DEPLOYMENT
             </div>
-        </section>
-
-        <section id="opciones" class="section">
-            <div class="container">
-                <h2 class="fade-in">Opciones de Refinanciamiento</h2>
-                <ul class="options-list fade-in">
-                    <li>
-                        <i class="fa-solid fa-house-chimney-medical"></i>
-                        <div><strong>Refinanciamiento con Retiro de Efectivo (Cash-Out):</strong> Obtenga liquidez inmediata basada en la plusvalía.</div>
-                    </li>
-                    <li>
-                        <i class="fa-solid fa-file-signature"></i>
-                        <div><strong>Refinanciamiento de Tasa y Plazo:</strong> La forma más directa de reestructurar y mejorar sus condiciones.</div>
-                    </li>
-                    <li>
-                        <i class="fa-solid fa-shield-halved"></i>
-                        <div><strong>Préstamos FHA y VA:</strong> Programas gubernamentales con requisitos flexibles.</div>
-                    </li>
-                </ul>
-            </div>
-        </section>
-
-        <section id="contacto" class="section bg-alt">
-            <div class="container">
-                <h2 class="fade-in">Inicie su Proceso Hoy</h2>
-                <div class="calculator-wrapper fade-in">
-                    <form onsubmit="event.preventDefault(); alert('Solicitud enviada.');">
-                        <div class="form-group"><label>Nombre Completo</label><input type="text" required></div>
-                        <div class="form-group"><label>Correo Electrónico</label><input type="email" required></div>
-                        <button type="submit" class="btn-main" style="width: 100%; justify-content: center;">Solicitar Asesoría</button>
-                    </form>
-                </div>
-            </div>
-        </section>
-    </main>
-
-    <footer>
-        <div class="container">
-            <div class="footer-grid">
-                <div class="footer-col">
-                    <h4>PremiumFinance</h4>
-                    <p>Soluciones hipotecarias inteligentes.</p>
-                </div>
-                <div class="footer-col">
-                    <h4>Contacto</h4>
-                    <p><i class="fa-solid fa-phone"></i> 1-800-HIPOTECA</p>
-                    <p><i class="fa-solid fa-envelope"></i> info@premiumfinance.com</p>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <p>&copy; 2026 Soluciones Hipotecarias Profesionales. NMLS #847392.</p>
+            <div class="flex gap-6">
+                <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+                <div class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Estado: Operacional</div>
             </div>
         </div>
     </footer>
 
     <script>
-        // SCRIPT DEL CANVAS (Red de Nodos)
-        const canvas = document.getElementById('heroCanvas');
-        const ctx = canvas.getContext('2d');
-        let particlesArray;
+        // Inicializar Iconos
+        lucide.createIcons();
 
-        canvas.width = window.innerWidth;
-        canvas.height = document.querySelector('header').offsetHeight;
+        // MOTOR THREE.JS (El Núcleo de Energía)
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        document.getElementById('canvas-container').appendChild(renderer.domElement);
 
+        // Geometría del Núcleo Axion
+        const geometry = new THREE.IcosahedronGeometry(2, 15);
+        const material = new THREE.MeshPhongMaterial({
+            color: 0x0057FF,
+            wireframe: true,
+            transparent: true,
+            opacity: 0.3,
+            emissive: 0x001A4D
+        });
+        
+        const core = new THREE.Mesh(geometry, material);
+        scene.add(core);
+
+        // Añadir una esfera interna sólida
+        const innerGeo = new THREE.SphereGeometry(1.2, 32, 32);
+        const innerMat = new THREE.MeshPhongMaterial({
+            color: 0x00F0FF,
+            emissive: 0x0057FF,
+            shininess: 100
+        });
+        const innerCore = new THREE.Mesh(innerGeo, innerMat);
+        scene.add(innerCore);
+
+        // Luces
+        const light1 = new THREE.PointLight(0x0057FF, 20);
+        light1.position.set(5, 5, 5);
+        scene.add(light1);
+
+        const light2 = new THREE.PointLight(0x00F0FF, 10);
+        light2.position.set(-5, -5, 5);
+        scene.add(light2);
+
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.2);
+        scene.add(ambientLight);
+
+        camera.position.z = 5;
+
+        // Animación Progresiva
+        const animate = () => {
+            requestAnimationFrame(animate);
+            
+            const time = Date.now() * 0.001;
+            
+            core.rotation.y += 0.005;
+            core.rotation.z += 0.003;
+            
+            // Deformación simulada
+            core.scale.x = 1 + Math.sin(time) * 0.1;
+            core.scale.y = 1 + Math.cos(time) * 0.1;
+            
+            innerCore.scale.x = 1 + Math.sin(time * 2) * 0.05;
+            innerCore.scale.y = 1 + Math.cos(time * 2) * 0.05;
+
+            renderer.render(scene, camera);
+        };
+
+        // Resize handler
         window.addEventListener('resize', () => {
-            canvas.width = window.innerWidth;
-            canvas.height = document.querySelector('header').offsetHeight;
-            initCanvas();
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
         });
 
-        class Particle {
-            constructor(x, y, directionX, directionY, size, color) {
-                this.x = x; this.y = y;
-                this.directionX = directionX; this.directionY = directionY;
-                this.size = size; this.color = color;
-            }
-            draw() {
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2, false);
-                ctx.fillStyle = this.color;
-                ctx.fill();
-            }
-            update() {
-                if (this.x > canvas.width || this.x < 0) this.directionX = -this.directionX;
-                if (this.y > canvas.height || this.y < 0) this.directionY = -this.directionY;
-                this.x += this.directionX;
-                this.y += this.directionY;
-                this.draw();
-            }
-        }
+        animate();
 
-        function initCanvas() {
-            particlesArray = [];
-            let numberOfParticles = (canvas.height * canvas.width) / 9000;
-            for (let i = 0; i < numberOfParticles; i++) {
-                let size = (Math.random() * 3) + 1;
-                let x = (Math.random() * ((innerWidth - size * 2) - (size * 2)) + size * 2);
-                let y = (Math.random() * ((innerHeight - size * 2) - (size * 2)) + size * 2);
-                let directionX = (Math.random() * 2) - 1;
-                let directionY = (Math.random() * 2) - 1;
-                let color = 'rgba(255, 255, 255, 0.8)';
-                particlesArray.push(new Particle(x, y, directionX, directionY, size, color));
-            }
-        }
-
-        function animateCanvas() {
-            requestAnimationFrame(animateCanvas);
-            ctx.clearRect(0, 0, innerWidth, innerHeight);
-            for (let i = 0; i < particlesArray.length; i++) {
-                particlesArray[i].update();
-            }
-            connectParticles();
-        }
-
-        function connectParticles() {
-            let opacityValue = 1;
-            for (let a = 0; a < particlesArray.length; a++) {
-                for (let b = a; b < particlesArray.length; b++) {
-                    let distance = ((particlesArray[a].x - particlesArray[b].x) * (particlesArray[a].x - particlesArray[b].x)) + 
-                                   ((particlesArray[a].y - particlesArray[b].y) * (particlesArray[a].y - particlesArray[b].y));
-                    if (distance < (canvas.width / 7) * (canvas.height / 7)) {
-                        opacityValue = 1 - (distance / 10000);
-                        ctx.strokeStyle = 'rgba(255, 255, 255,' + opacityValue + ')';
-                        ctx.lineWidth = 1;
-                        ctx.beginPath();
-                        ctx.moveTo(particlesArray[a].x, particlesArray[a].y);
-                        ctx.lineTo(particlesArray[b].x, particlesArray[b].y);
-                        ctx.stroke();
-                    }
-                }
-            }
-        }
-        initCanvas();
-        animateCanvas();
-
-        // RESTO DE SCRIPTS
-        function calculateMortgage() {
-            const p = parseFloat(document.getElementById('loanAmount').value);
-            const r = parseFloat(document.getElementById('interestRate').value);
-            const y = parseInt(document.getElementById('loanTerm').value);
-            if (isNaN(p) || isNaN(r) || isNaN(y) || p <= 0) return alert("Valores inválidos.");
-            const mr = (r / 100) / 12;
-            const np = y * 12;
-            let mp = mr === 0 ? p / np : p * (mr * Math.pow(1 + mr, np)) / (Math.pow(1 + mr, np) - 1);
-            document.getElementById('monthlyPayment').innerText = "$" + mp.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
-            document.getElementById('resultBox').style.display = 'block';
-        }
-
-        const observer = new IntersectionObserver((entries, obs) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('visible');
-                    obs.unobserve(entry.target);
-                }
-            });
-        }, { threshold: 0.15 });
-        document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
-
-        const toggle = document.getElementById('themeToggle');
-        const html = document.documentElement;
-        toggle.addEventListener('click', () => {
-            const isLight = html.getAttribute('data-theme') === 'light';
-            html.setAttribute('data-theme', isLight ? 'dark' : 'light');
-            toggle.innerHTML = isLight ? '<i class="fa-solid fa-sun"></i>' : '<i class="fa-solid fa-moon"></i>';
+        // Interacción suave con el mouse
+        document.addEventListener('mousemove', (e) => {
+            const x = (e.clientX / window.innerWidth) - 0.5;
+            const y = (e.clientY / window.innerHeight) - 0.5;
+            
+            core.position.x = x * 0.5;
+            core.position.y = -y * 0.5;
+            innerCore.position.x = x * 0.3;
+            innerCore.position.y = -y * 0.3;
         });
     </script>
 </body>
