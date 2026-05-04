@@ -1,152 +1,164 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>AXION | OMNIMIND ENGINE</title>
+    <title>AXION | WORLD-CLASS DIGITAL ARCHITECTURE</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.0/three.min.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
-
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        gold: '#D4AF37',
+                        obsidian: '#020202',
+                        slate: '#0A0A0A',
+                    }
+                }
+            }
+        }
+    </script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200;400;800&family=JetBrains+Mono:wght@200&display=swap');
-        body { background: #020202; color: #f0f0f0; font-family: 'Plus Jakarta Sans', sans-serif; overflow: hidden; height: 100dvh; }
-        
-        .glass {
-            background: rgba(10, 10, 10, 0.7);
-            backdrop-filter: blur(25px) saturate(180%);
-            -webkit-backdrop-filter: blur(25px);
-            border: 1px solid rgba(212, 175, 55, 0.15);
-        }
-
-        .gold-gradient { background: linear-gradient(135deg, #D4AF37 0%, #F4D03F 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        #bg-canvas { position: fixed; top: 0; left: 0; z-index: -1; opacity: 0.5; }
-
-        /* Animación de Transición de Página */
-        .page-fade { animation: fadeIn 0.8s ease-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
+        body { background: #020202; color: #f0f0f0; font-family: 'Plus Jakarta Sans', sans-serif; overflow-x: hidden; }
+        .glass { background: rgba(10, 10, 10, 0.7); backdrop-filter: blur(20px); border: 1px solid rgba(212, 175, 55, 0.15); }
+        .gold-glow { text-shadow: 0 0 20px rgba(212, 175, 55, 0.5); }
+        .cta-button { transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1); }
+        .cta-button:hover { transform: scale(1.05); box-shadow: 0 0 30px rgba(212, 175, 55, 0.3); }
+        #canvas-bg { position: fixed; top: 0; left: 0; z-index: -1; }
+        .grid-sales { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; }
     </style>
 </head>
-<body class="flex flex-col p-4 md:p-10">
+<body class="p-4 md:p-8">
 
-    <canvas id="bg-canvas"></canvas>
+    <canvas id="canvas-bg"></canvas>
 
-    <nav class="glass rounded-full px-8 py-4 flex justify-between items-center mb-10 z-50 border-luxGold/20">
-        <div class="flex items-center gap-3">
-            <div class="w-3 h-3 bg-luxGold rounded-full animate-pulse shadow-[0_0_15px_#D4AF37]"></div>
-            <h1 class="text-xl font-black tracking-tighter uppercase italic">AXION <span class="font-light text-luxGold">CORE</span></h1>
+    <nav class="glass rounded-full px-6 py-4 flex justify-between items-center sticky top-6 z-50 max-w-7xl mx-auto border-gold/10">
+        <div class="flex items-center gap-2">
+            <div class="w-2 h-8 bg-gold"></div>
+            <span class="text-xl font-black tracking-tighter uppercase italic">AXION <span class="font-light text-gold">SYSTEMS</span></span>
         </div>
-        
-        <div class="hidden md:flex gap-10 text-[11px] font-bold tracking-[0.4em] uppercase">
-            <button onclick="window.location.reload()" class="hover:text-luxGold transition cursor-pointer">01_Inicio</button>
-            <a href="Sistemas.html" class="text-luxGold border-b border-luxGold/40 pb-1 hover:text-white transition">02_Sistemas</a>
-            <button onclick="runDiagnostic()" class="hover:text-luxGold transition">03_Seguridad</button>
+        <div class="hidden md:flex gap-8 text-[10px] font-bold tracking-[0.4em] uppercase">
+            <a href="#soluciones" class="hover:text-gold transition">Soluciones</a>
+            <a href="#erp" class="hover:text-gold transition">ERP_Quantum</a>
+            <a href="Sistemas.html" class="hover:text-gold transition">Dashboard</a>
         </div>
-
-        <div class="flex items-center gap-4">
-            <div id="status-tag" class="text-[9px] font-mono bg-luxGold/10 text-luxGold px-3 py-1 rounded-full border border-luxGold/20 uppercase tracking-widest">Sincronizado</div>
-        </div>
+        <button class="bg-gold text-black px-6 py-2 rounded-full text-[10px] font-black uppercase tracking-widest cta-button">
+            Solicitar Auditoría
+        </button>
     </nav>
 
-    <main id="main-content" class="page-fade relative flex-1 grid grid-cols-1 md:grid-cols-12 gap-8">
-        
-        <div class="md:col-span-4 space-y-6">
-            <div class="glass p-8 rounded-[2.5rem] relative overflow-hidden group">
-                <div class="absolute -right-4 -top-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                    <i data-lucide="activity" class="w-32 h-32 text-luxGold"></i>
-                </div>
-                <p class="text-[10px] text-gray-500 uppercase tracking-widest mb-4">Neural Data Stream</p>
-                <div class="text-5xl font-black italic tracking-tighter">1.2<span class="text-luxGold text-2xl">TB/s</span></div>
-                <div class="mt-6 flex gap-2">
-                    <div class="h-1 flex-1 bg-luxGold/20 rounded-full overflow-hidden">
-                        <div class="h-full bg-luxGold w-3/4 animate-pulse"></div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="glass p-8 rounded-[2.5rem] border-l-4 border-luxGold">
-                <h4 class="text-xs font-bold uppercase tracking-widest mb-4">Estado del Nodo</h4>
-                <div class="space-y-3 text-[11px] font-mono">
-                    <div class="flex justify-between"><span class="text-gray-500">Uptime:</span> <span class="text-white">99.99%</span></div>
-                    <div class="flex justify-between"><span class="text-gray-500">Sistemas.html:</span> <span class="text-green-500">CONECTADO</span></div>
-                    <div class="flex justify-between"><span class="text-gray-500">Latencia:</span> <span class="text-luxGold">0.001ms</span></div>
+    <section class="max-w-7xl mx-auto pt-20 pb-32 text-center md:text-left grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+        <div>
+            <span class="text-gold text-xs font-bold tracking-[0.5em] uppercase mb-4 block">Ingeniería de Primer Mundo</span>
+            <h2 class="text-6xl md:text-8xl font-black tracking-tighter leading-none mb-6 italic uppercase">
+                Arquitectura <br> <span class="text-gold font-light not-italic">Digital Infinita.</span>
+            </h2>
+            <p class="text-gray-400 text-lg md:text-xl max-w-lg mb-10 leading-relaxed">
+                Diseñamos ecosistemas web y sistemas ERP que eliminan la fricción operativa. No construimos páginas; creamos **activos de alto rendimiento**.
+            </p>
+            <div class="flex flex-col md:flex-row gap-4">
+                <button class="glass border-gold text-white px-10 py-5 rounded-2xl font-bold uppercase tracking-widest cta-button">Ver Proyectos</button>
+                <div class="flex items-center gap-4 px-6 text-xs text-gray-500 italic">
+                    <i data-lucide="shield-check" class="text-gold"></i> ISO-2045 SECURITY STANDARDS
                 </div>
             </div>
         </div>
-
-        <div class="md:col-span-8 glass rounded-[3rem] p-2 overflow-hidden flex flex-col border border-luxGold/10">
-            <div class="bg-black/60 h-full rounded-[2.8rem] p-8 flex flex-col font-mono">
-                <div id="terminal-log" class="flex-1 overflow-y-auto text-[12px] space-y-3 text-gray-400">
-                    <p class="text-luxGold">[SISTEMA] Bienvenido a OMNIMIND-X.</p>
-                    <p>[SISTEMA] Enlace detectado: <span class="text-white underline">Sistemas.html</span> preparado para ejecución.</p>
-                    <p class="opacity-30">---------------------------------------------------------</p>
+        <div class="hidden md:block relative">
+            <div class="absolute inset-0 bg-gold/20 blur-[120px] rounded-full"></div>
+            <div class="glass p-10 rounded-[3rem] border-gold/30">
+                <div class="flex justify-between items-center mb-8">
+                    <span class="text-[10px] font-mono text-gold tracking-widest">SISTEMA_ACTIVO</span>
+                    <i data-lucide="activity" class="w-4 h-4 text-gold"></i>
                 </div>
-                <div class="mt-6 flex items-center gap-4 bg-white/5 p-4 rounded-2xl border border-white/5">
-                    <span class="text-luxGold animate-pulse">#</span>
-                    <input type="text" id="cmd-in" class="bg-transparent outline-none w-full text-white text-sm" placeholder="Solicitar acceso a Sistemas..." autocomplete="off">
+                <div class="space-y-6">
+                    <div class="h-2 w-full bg-white/5 rounded-full overflow-hidden"><div class="h-full bg-gold w-3/4 animate-pulse"></div></div>
+                    <div class="h-2 w-full bg-white/5 rounded-full overflow-hidden"><div class="h-full bg-gold w-1/2"></div></div>
+                    <div class="h-2 w-full bg-white/5 rounded-full overflow-hidden"><div class="h-full bg-gold w-5/6"></div></div>
                 </div>
+                <p class="mt-8 font-mono text-[10px] text-gray-500">> Optimizando ROI en tiempo real...</p>
             </div>
         </div>
-    </main>
+    </section>
 
-    <footer class="md:hidden fixed bottom-8 left-8 right-8 flex gap-4 z-50">
-        <a href="index.html" class="flex-1 glass py-4 rounded-2xl flex justify-center items-center gold-border shadow-2xl">
-            <i data-lucide="home" class="w-6 h-6 text-luxGold"></i>
-        </a>
-        <a href="Sistemas.html" class="flex-1 glass py-4 rounded-2xl flex justify-center items-center gold-border shadow-2xl">
-            <i data-lucide="layers" class="w-6 h-6 text-luxGold"></i>
-        </a>
+    <section id="soluciones" class="max-w-7xl mx-auto py-20">
+        <h3 class="text-center text-[10px] tracking-[0.8em] uppercase text-gold mb-20">Nuestra Suite de Poder</h3>
+        <div class="grid-sales">
+            <div class="glass p-10 rounded-[2.5rem] hover:bg-white/5 transition-all group">
+                <i data-lucide="layers" class="w-12 h-12 text-gold mb-6 group-hover:scale-110 transition"></i>
+                <h4 class="text-2xl font-bold mb-4 uppercase">Sistemas ERP</h4>
+                <p class="text-gray-500 text-sm mb-8">Control total de inventario, finanzas y logística en una interfaz de grado militar. Escalabilidad infinita.</p>
+                <ul class="text-[10px] font-mono space-y-2 text-gold/80 mb-8">
+                    <li>+ AUTOMATIZACIÓN 100%</li>
+                    <li>+ INTEGRACIÓN API CLOUD</li>
+                    <li>+ LATENCIA CERO</li>
+                </ul>
+                <button class="w-full border border-white/10 py-4 rounded-xl text-[10px] font-black uppercase hover:bg-gold hover:text-black transition">Cotizar Sistema</button>
+            </div>
+
+            <div class="glass p-10 rounded-[2.5rem] hover:bg-white/5 transition-all group border-t-4 border-gold">
+                <i data-lucide="layout" class="w-12 h-12 text-gold mb-6 group-hover:scale-110 transition"></i>
+                <h4 class="text-2xl font-bold mb-4 uppercase">Webs de Alto Nivel</h4>
+                <p class="text-gray-500 text-sm mb-8">No son solo landing pages. Son motores de venta optimizados para conversión psicológica y velocidad extrema.</p>
+                <ul class="text-[10px] font-mono space-y-2 text-gold/80 mb-8">
+                    <li>+ DISEÑO UX PREMIADO</li>
+                    <li>+ SEO DOMINANTE</li>
+                    <li>+ WEBGL 3D INTERACTIVO</li>
+                </ul>
+                <button class="w-full bg-gold text-black py-4 rounded-xl text-[10px] font-black uppercase transition">Crear mi Marca</button>
+            </div>
+
+            <div class="glass p-10 rounded-[2.5rem] hover:bg-white/5 transition-all group">
+                <i data-lucide="cpu" class="w-12 h-12 text-gold mb-6 group-hover:scale-110 transition"></i>
+                <h4 class="text-2xl font-bold mb-4 uppercase">Nodos IA</h4>
+                <p class="text-gray-500 text-sm mb-8">Inyectamos inteligencia artificial en tu flujo de trabajo para eliminar tareas repetitivas.</p>
+                <ul class="text-[10px] font-mono space-y-2 text-gold/80 mb-8">
+                    <li>+ CHATBOTS AVANZADOS</li>
+                    <li>+ ANÁLISIS PREDICTIVO</li>
+                    <li>+ OMNIMIND ENGINE</li>
+                </ul>
+                <button class="w-full border border-white/10 py-4 rounded-xl text-[10px] font-black uppercase hover:bg-gold hover:text-black transition">Auditar Negocio</button>
+            </div>
+        </div>
+    </section>
+
+    <footer class="max-w-7xl mx-auto py-20 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-8">
+        <div class="text-[10px] font-mono text-gray-600 tracking-widest uppercase">
+            © 2045 AXION SYSTEMS // THE SINGULARITY IS HERE
+        </div>
+        <div class="flex gap-6">
+            <i data-lucide="instagram" class="w-4 h-4 text-gray-500 hover:text-gold cursor-pointer"></i>
+            <i data-lucide="linkedin" class="w-4 h-4 text-gray-500 hover:text-gold cursor-pointer"></i>
+            <i data-lucide="twitter" class="w-4 h-4 text-gray-500 hover:text-gold cursor-pointer"></i>
+        </div>
     </footer>
 
     <script>
         lucide.createIcons();
 
-        // MOTOR VISUAL 3D (Refinado)
+        // MOTOR 3D: NEURAL SALES BACKGROUND
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('bg-canvas'), alpha: true, antialias: true });
-        renderer.setPixelRatio(window.devicePixelRatio);
+        const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('canvas-bg'), alpha: true, antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-        const geo = new THREE.IcosahedronGeometry(15, 1);
-        const mat = new THREE.MeshBasicMaterial({ color: 0xD4AF37, wireframe: true, transparent: true, opacity: 0.05 });
-        const mesh = new THREE.Mesh(geo, mat);
-        scene.add(mesh);
+        const geometry = new THREE.TorusGeometry(20, 0.2, 16, 100);
+        const material = new THREE.MeshBasicMaterial({ color: 0xD4AF37, wireframe: true, transparent: true, opacity: 0.1 });
+        const ring = new THREE.Mesh(geometry, material);
+        scene.add(ring);
         camera.position.z = 30;
 
         function animate() {
             requestAnimationFrame(animate);
-            mesh.rotation.y += 0.001;
-            mesh.rotation.x += 0.0005;
+            ring.rotation.y += 0.005;
+            ring.rotation.x += 0.002;
             renderer.render(scene, camera);
         }
         animate();
-
-        // LÓGICA DE TERMINAL
-        const input = document.getElementById('cmd-in');
-        const log = document.getElementById('terminal-log');
-        
-        input.addEventListener('keypress', (e) => {
-            if(e.key === 'Enter' && input.value !== "") {
-                const val = input.value.toLowerCase();
-                const p = document.createElement('p');
-                p.innerHTML = `<span class="text-luxGold">>></span> ${input.value}`;
-                log.appendChild(p);
-                
-                if(val.includes('sistemas')) {
-                    setTimeout(() => {
-                        const r = document.createElement('p');
-                        r.className = "text-green-500 font-bold";
-                        r.innerText = "[ACCESO] Redirigiendo a Sistemas.html en 1.5s...";
-                        log.appendChild(r);
-                        setTimeout(() => window.location.href = "Sistemas.html", 1500);
-                    }, 500);
-                }
-                
-                input.value = '';
-                log.scrollTop = log.scrollHeight;
-            }
-        });
 
         window.addEventListener('resize', () => {
             camera.aspect = window.innerWidth / window.innerHeight;
