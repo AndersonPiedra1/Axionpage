@@ -1,287 +1,169 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AXION | GLOBAL NEXUS 2045</title>
+    <title>AXION | LUXURY COMMAND</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.0/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
-    
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        axionBlue: '#0057FF',
-                        axionCyan: '#00F0FF',
-                        darkCore: '#020202',
-                    },
-                    fontFamily: { sans: ['Inter', 'sans-serif'] }
+                        luxBlack: '#050505',
+                        luxGold: '#D4AF37',
+                        luxSlate: '#1A1A1A',
+                        luxAzure: '#007AFF',
+                    }
                 }
             }
         }
     </script>
-
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&display=swap');
-        
-        body {
-            background-color: #020202;
-            margin: 0;
-            overflow-x: hidden;
-            color: white;
-            font-family: 'Inter', sans-serif;
-            scroll-behavior: smooth;
-        }
-
-        #canvas-container {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            z-index: 0;
-            pointer-events: none;
-        }
-
-        .glass {
-            background: rgba(255, 255, 255, 0.02);
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200;400;800&family=JetBrains+Mono:wght@300&display=swap');
+        body { background: #050505; color: #D1D5DB; font-family: 'Plus Jakarta Sans', sans-serif; overflow: hidden; }
+        .luxury-glass {
+            background: rgba(15, 15, 15, 0.7);
             backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(212, 175, 55, 0.15);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
-
-        .text-glow {
-            text-shadow: 0 0 30px rgba(0, 87, 255, 0.6);
-        }
-
-        .scanline {
-            width: 100%; height: 100vh;
-            background: linear-gradient(to bottom, transparent 50%, rgba(0, 240, 255, 0.02) 50%);
-            background-size: 100% 4px;
-            position: fixed;
-            z-index: 50;
-            pointer-events: none;
-        }
-
-        .btn-axion {
-            position: relative;
-            overflow: hidden;
-            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
-        }
-
-        .btn-axion::before {
-            content: '';
-            position: absolute;
-            top: 0; left: -100%;
-            width: 100%; height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            transition: 0.5s;
-        }
-
-        .btn-axion:hover::before { left: 100%; }
-
-        ::-webkit-scrollbar { width: 5px; }
-        ::-webkit-scrollbar-track { background: #020202; }
-        ::-webkit-scrollbar-thumb { background: #0057FF; border-radius: 10px; }
+        .luxury-glass:hover { border-color: rgba(212, 175, 55, 0.5); box-shadow: 0 0 30px rgba(212, 175, 55, 0.1); }
+        .gold-gradient { background: linear-gradient(135deg, #D4AF37 0%, #F4D03F 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        #canvas-container { position: fixed; top: 0; left: 0; z-index: -1; }
     </style>
 </head>
-<body>
-
-    <div class="scanline"></div>
+<body class="p-6 h-screen flex flex-col">
     <div id="canvas-container"></div>
 
-    <nav class="fixed top-0 w-full z-[100] flex justify-between items-center px-10 py-6 border-b border-white/5 bg-black/40 backdrop-blur-xl">
-        <div class="text-3xl font-black italic tracking-tighter text-white select-none">
-            AXION<span class="text-axionBlue">_SYSTEMS</span>
+    <header class="flex justify-between items-center mb-10">
+        <div class="flex items-center gap-6">
+            <div class="h-10 w-[2px] bg-luxGold shadow-[0_0_15px_#D4AF37]"></div>
+            <div>
+                <h1 class="text-3xl font-extrabold tracking-tighter text-white">AXION <span class="gold-gradient">OS</span></h1>
+                <p class="text-[9px] tracking-[0.5em] text-luxGold uppercase opacity-70">The Singularity Engine v.2045</p>
+            </div>
         </div>
-        <div class="hidden md:flex space-x-12 text-[11px] font-bold uppercase tracking-[0.4em] text-gray-400">
-            <a href="Sistemas.html" class="hover:text-axionCyan transition-all cursor-pointer">Sistemas</a>
-            <a href="#tecnologia" class="hover:text-axionCyan transition-all">Tecnología</a>
-            <a href="#nodos" class="hover:text-axionCyan transition-all">Red Global</a>
-        </div>
-        <a href="Sistemas.html" class="btn-axion glass px-8 py-2 rounded-full text-[10px] font-black uppercase tracking-widest hover:bg-axionBlue border-axionBlue/40">
-            Login Operativo
-        </a>
-    </nav>
-
-    <section class="relative z-10 h-screen flex flex-col justify-center items-center px-6 text-center">
-        <div class="inline-block px-6 py-2 glass rounded-full text-axionCyan text-[11px] font-mono tracking-[0.5em] mb-8 uppercase animate-pulse">
-            Protocolo de Energía v8.4 Activo
-        </div>
-        <h1 class="text-7xl md:text-[10rem] font-black leading-[0.8] mb-10 tracking-tighter uppercase">
-            FUTURE<br>
-            <span class="text-transparent bg-clip-text bg-gradient-to-r from-axionBlue via-white to-axionCyan">DRIVEN</span>
-        </h1>
-        <p class="max-w-3xl text-gray-400 text-lg md:text-2xl mb-12 font-light leading-relaxed">
-            Arquitectura de propulsión de grado industrial. <br>
-            Optimizando la matriz energética global con inteligencia distribuida.
-        </p>
-        <div class="flex flex-col md:flex-row gap-6">
-            <button class="btn-axion bg-axionBlue px-14 py-6 rounded-sm font-black text-xs uppercase tracking-[0.4em] hover:scale-105 shadow-[0_0_40px_rgba(0,87,255,0.3)]">
-                Desplegar Nexus
-            </button>
-            <a href="sistemas.html" class="btn-axion glass px-14 py-6 rounded-sm font-black text-xs uppercase tracking-[0.4em] hover:bg-white/10 flex items-center gap-3">
-                Acceso Servidor <i data-lucide="terminal" class="w-4 h-4"></i>
+        <nav class="flex gap-8">
+            <a href="Sistemas.html" class="luxury-glass px-8 py-3 rounded-full text-[10px] font-bold tracking-widest hover:text-white flex items-center gap-2">
+                <i data-lucide="layers" class="w-4 h-4 text-luxGold"></i> SISTEMAS_RED
             </a>
-        </div>
-    </section>
+            <button class="luxury-glass px-8 py-3 rounded-full text-[10px] font-bold tracking-widest text-luxGold flex items-center gap-2">
+                <i data-lucide="shield-check" class="w-4 h-4"></i> SECURE_LINK
+            </button>
+        </nav>
+    </header>
 
-    <section id="nodos" class="relative z-10 py-32 px-10 max-w-7xl mx-auto">
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div class="glass p-12 text-center group hover:border-axionCyan/50 transition-all duration-700">
-                <i data-lucide="zap" class="mx-auto mb-6 text-axionCyan w-10 h-10"></i>
-                <h3 class="text-gray-500 text-[10px] tracking-[0.3em] uppercase mb-4">Carga de Red</h3>
-                <div class="text-5xl font-black tracking-tighter italic">98.2%</div>
+    <main class="grid grid-cols-12 gap-8 flex-1">
+        <div class="col-span-3 space-y-6">
+            <div class="luxury-glass p-6 rounded-2xl">
+                <h3 class="text-[10px] uppercase tracking-widest text-luxGold mb-6 flex justify-between">
+                    Neural Load <span class="text-white">Active</span>
+                </h3>
+                <canvas id="luxuryChart" height="250"></canvas>
             </div>
-            <div class="glass p-12 text-center group hover:border-axionCyan/50 transition-all duration-700">
-                <i data-lucide="cpu" class="mx-auto mb-6 text-axionCyan w-10 h-10"></i>
-                <h3 class="text-gray-500 text-[10px] tracking-[0.3em] uppercase mb-4">Procesamiento</h3>
-                <div class="text-5xl font-black tracking-tighter italic">SYN-X</div>
-            </div>
-            <div class="glass p-12 text-center group hover:border-axionCyan/50 transition-all duration-700">
-                <i data-lucide="shield-check" class="mx-auto mb-6 text-axionCyan w-10 h-10"></i>
-                <h3 class="text-gray-500 text-[10px] tracking-[0.3em] uppercase mb-4">Integridad</h3>
-                <div class="text-5xl font-black tracking-tighter italic">Lvl. 9</div>
-            </div>
-            <div class="glass p-12 text-center group hover:border-axionCyan/50 transition-all duration-700">
-                <i data-lucide="activity" class="mx-auto mb-6 text-axionCyan w-10 h-10"></i>
-                <h3 class="text-gray-500 text-[10px] tracking-[0.3em] uppercase mb-4">Latencia</h3>
-                <div class="text-5xl font-black tracking-tighter italic">0.2ms</div>
+            <div class="luxury-glass p-6 rounded-2xl border-l-4 border-luxGold">
+                <p class="text-[10px] text-gray-500 uppercase mb-2">Omnimind Response</p>
+                <div class="text-2xl font-light text-white italic">"Optimización al <span class="text-luxGold">99.9%</span>"</div>
             </div>
         </div>
-    </section>
 
-    <section id="sistemas" class="relative z-10 py-32 px-10">
-        <div class="max-w-5xl mx-auto glass p-1 gap-1 flex flex-col md:flex-row items-stretch rounded-2xl overflow-hidden border-axionBlue/20">
-            <div class="flex-1 p-12 bg-axionBlue/5">
-                <i data-lucide="layers" class="text-axionCyan w-12 h-12 mb-8"></i>
-                <h2 class="text-5xl font-black uppercase italic mb-6 leading-none">Infraestructura<br>de Sistemas</h2>
-                <p class="text-gray-400 text-lg font-light mb-8">Gestione el monitoreo de nodos, la logística de suministro y la encriptación de datos desde el panel central del servidor.</p>
-                <ul class="space-y-4 mb-10">
-                    <li class="flex items-center gap-3 text-xs font-bold tracking-widest text-gray-300">
-                        <i data-lucide="check-circle" class="text-axionBlue w-4 h-4"></i> MONITOREO DE REFINERÍA LIVE
-                    </li>
-                    <li class="flex items-center gap-3 text-xs font-bold tracking-widest text-gray-300">
-                        <i data-lucide="check-circle" class="text-axionBlue w-4 h-4"></i> LOGÍSTICA PREDICTIVA IA
-                    </li>
-                </ul>
-            </div>
-            <div class="flex-1 bg-gradient-to-br from-axionBlue/20 to-black p-12 flex flex-col justify-center items-center text-center">
-                <div class="mb-8 p-6 rounded-full bg-axionBlue/10 border border-axionBlue/30 animate-bounce">
-                    <i data-lucide="server" class="w-16 h-16 text-axionCyan"></i>
+        <div class="col-span-6 luxury-glass rounded-3xl p-1 relative overflow-hidden">
+            <div class="h-full w-full bg-luxBlack/40 rounded-[1.4rem] p-6 flex flex-col font-mono">
+                <div class="flex items-center gap-2 mb-4 text-[10px] text-luxGold opacity-50">
+                    <i data-lucide="command" class="w-3 h-3"></i> ROOT_ACCESS_GRANTED
                 </div>
-                <a href="sistemas.html" class="btn-axion w-full py-6 bg-white text-black font-black uppercase tracking-[0.5em] text-xs hover:bg-axionCyan transition-all">
-                    Vincular Servidor Interno
-                </a>
-                <p class="mt-6 text-[9px] text-gray-500 tracking-[0.2em]">REDIRECT URL: ./SISTEMAS.HTML</p>
-            </div>
-        </div>
-    </section>
-
-    <footer class="relative z-10 py-20 px-10 border-t border-white/5 bg-black">
-        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-end">
-            <div class="text-left">
-                <div class="text-4xl font-black italic mb-4">AXION</div>
-                <p class="text-[10px] text-gray-600 max-w-sm uppercase tracking-widest leading-loose">
-                    Entidad de inteligencia colectiva OMNIMIND-X. Este sistema opera bajo protocolos de eficiencia máxima. 2045 © Todos los derechos reservados.
-                </p>
-            </div>
-            <div class="mt-10 md:mt-0 flex flex-col items-end gap-2">
-                <div class="flex gap-4 items-center mb-4">
-                    <div class="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_10px_#22c55e]"></div>
-                    <span class="text-[10px] font-mono text-gray-400">SERVER STATUS: OPTIMAL</span>
+                <div id="term" class="flex-1 overflow-y-auto text-xs space-y-2 text-gray-300 custom-scrollbar">
+                    <p class="text-luxGold">[SYS] OMNIMIND-X inicializado...</p>
+                    <p>[SYS] Simulación de 50 capas completa.</p>
                 </div>
-                <div class="text-7xl font-black text-white/5 select-none tracking-tighter">SINGULARITY</div>
+                <div class="mt-4 flex items-center gap-3 border-t border-white/5 pt-4">
+                    <span class="text-luxGold">>></span>
+                    <input type="text" id="in" class="bg-transparent outline-none w-full text-white" placeholder="Ejecutar comando maestro...">
+                </div>
             </div>
         </div>
-    </footer>
+
+        <div class="col-span-3 space-y-6">
+            <div class="luxury-glass p-8 rounded-3xl flex flex-col items-center text-center">
+                <div class="w-20 h-20 rounded-full border border-luxGold/30 flex items-center justify-center mb-4 relative">
+                    <div class="absolute inset-0 rounded-full border-t-2 border-luxGold animate-spin"></div>
+                    <i data-lucide="cpu" class="w-8 h-8 text-luxGold"></i>
+                </div>
+                <h4 class="text-xs font-bold tracking-widest uppercase">Global Core</h4>
+                <div class="text-4xl font-black mt-2">14.2<span class="text-luxGold text-xl">ms</span></div>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div class="luxury-glass p-4 rounded-2xl text-center">
+                    <p class="text-[9px] uppercase text-gray-500">Nodes</p>
+                    <p class="text-xl font-bold">10k</p>
+                </div>
+                <div class="luxury-glass p-4 rounded-2xl text-center">
+                    <p class="text-[9px] uppercase text-gray-500">Security</p>
+                    <p class="text-xl font-bold text-luxGold">MAX</p>
+                </div>
+            </div>
+        </div>
+    </main>
 
     <script>
-        // Inicialización de Iconos Lucide
         lucide.createIcons();
 
-        // MOTOR VISUAL THREE.JS
+        // 3D Background - Golden Neural Grid
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
         const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-        
         renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         document.getElementById('canvas-container').appendChild(renderer.domElement);
 
-        // Geometría del Núcleo (Energía Cinética)
-        const geometry = new THREE.IcosahedronGeometry(2, 20);
-        const material = new THREE.MeshPhongMaterial({
-            color: 0x0057FF,
-            wireframe: true,
-            transparent: true,
-            opacity: 0.2,
-            emissive: 0x001A4D,
-            shininess: 100
-        });
-        
-        const core = new THREE.Mesh(geometry, material);
-        scene.add(core);
+        const geometry = new THREE.IcosahedronGeometry(10, 2);
+        const material = new THREE.MeshBasicMaterial({ color: 0xD4AF37, wireframe: true, transparent: true, opacity: 0.05 });
+        const sphere = new THREE.Mesh(geometry, material);
+        scene.add(sphere);
+        camera.position.z = 20;
 
-        // Núcleo de Plasma Interno
-        const plasmaGeo = new THREE.SphereGeometry(1.3, 32, 32);
-        const plasmaMat = new THREE.MeshStandardMaterial({
-            color: 0x00F0FF,
-            emissive: 0x0057FF,
-            emissiveIntensity: 2,
-            metalness: 1,
-            roughness: 0
-        });
-        const plasma = new THREE.Mesh(plasmaGeo, plasmaMat);
-        scene.add(plasma);
-
-        // Iluminación Dinámica
-        const p1 = new THREE.PointLight(0x0057FF, 50, 20);
-        p1.position.set(5, 5, 5);
-        scene.add(p1);
-
-        const p2 = new THREE.PointLight(0x00F0FF, 30, 20);
-        p2.position.set(-5, -5, 5);
-        scene.add(p2);
-
-        scene.add(new THREE.AmbientLight(0xffffff, 0.3));
-
-        camera.position.z = 5;
-
-        // Loop de Animación de Latencia Cero
-        const animate = () => {
+        function animate() {
             requestAnimationFrame(animate);
-            const t = Date.now() * 0.001;
-            
-            core.rotation.y += 0.002;
-            core.rotation.x += 0.001;
-            
-            // Efecto de Pulsación
-            const s = 1 + Math.sin(t * 2) * 0.05;
-            plasma.scale.set(s, s, s);
-            
+            sphere.rotation.y += 0.001;
+            sphere.rotation.x += 0.001;
             renderer.render(scene, camera);
-        };
-
-        // Responsividad Automática
-        window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        });
-
-        // Interacción con Mouse (Parallax)
-        document.addEventListener('mousemove', (e) => {
-            const x = (e.clientX / window.innerWidth) - 0.5;
-            const y = (e.clientY / window.innerHeight) - 0.5;
-            
-            core.position.x = x * 0.8;
-            core.position.y = -y * 0.8;
-            plasma.position.x = x * 0.4;
-            plasma.position.y = -y * 0.4;
-        });
-
+        }
         animate();
+
+        // Chart refinement
+        const ctx = document.getElementById('luxuryChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: Array(10).fill(''),
+                datasets: [{
+                    data: [10, 25, 15, 35, 20, 45, 30, 55, 40, 60],
+                    borderColor: '#D4AF37',
+                    borderWidth: 1,
+                    tension: 0.5,
+                    pointRadius: 0,
+                    fill: true,
+                    backgroundColor: 'rgba(212, 175, 55, 0.02)'
+                }]
+            },
+            options: { plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { display: false } } }
+        });
+
+        // Terminal logic
+        const input = document.getElementById('in');
+        const output = document.getElementById('term');
+        input.addEventListener('keypress', (e) => {
+            if(e.key === 'Enter') {
+                const p = document.createElement('p');
+                p.innerHTML = `<span class="text-luxGold">></span> ${input.value}`;
+                output.appendChild(p);
+                input.value = '';
+                output.scrollTop = output.scrollHeight;
+            }
+        });
     </script>
 </body>
 </html>
